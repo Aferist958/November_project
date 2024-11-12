@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker</title>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Регистрация</h2>
+        <form method="post">
+            {% csrf_token %}
+                <div class="user-box">
+                    {{ form.user }}
+                    <label>Логин</label>
+                </div>
+                <div class="user-box">
+                    {{ form.name }}
+                    <label>Имя</label>
+                </div>
+                <div class="user-box">
+                    {{ form.surname }}
+                    <label>Фамилия</label>
+                </div>
+                <div class="user-box">
+                    {{ form.email }}
+                    <label>Почта</label>
+                </div>
+                <div class="user-box">
+                     {{ form.password1 }}
+                    <label>Пароль</label>
+                </div>
+                <div class="user-box">
+                    {{ form.password2 }}
+                    <label>Повторите пароль</label>
+                </div>
+                <button type="submit"><span></span>
+                    <a href="{% url 'register' %}">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        регистрация
+                    </a>
+                </button>
+
+                <a href="{% url 'login' %}">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    вход
+                </a>
+        </form>
+      </div>
+
+
+</body>
+</html>
