@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'users',
     'project',
     'task',
@@ -55,6 +56,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'Task_Tracker.urls'
+
 
 TEMPLATES = [
     {
@@ -81,7 +83,7 @@ WSGI_APPLICATION = 'Task_Tracker.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": 'django.db.backends.sqlite3',
-        "NAME": os.path.join(BASE_DIR, 'db.sqlite3'),
+        "NAME": BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -126,3 +128,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+  'DEFAULT_AUTHENTICATION_CLASSES': (
+    'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+  ),
+}

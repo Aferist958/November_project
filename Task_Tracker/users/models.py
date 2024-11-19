@@ -1,40 +1,51 @@
 from django.db import models
-from django.contrib.auth.models import User
-from pygments.lexers import get_all_lexers, get_lexer_by_name
-from pygments.formatters.html import HtmlFormatter
-from pygments import highlight
-from pygments.styles import get_all_styles
+import jwt.jwt as j
+from datetime import datetime, timedelta
+from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db import models
 
-LEXERS = [item for item in get_all_lexers() if item[1]]
-LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])
-STYLE_CHOICES = sorted([(item, item) for item in get_all_styles()])
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    name = models.CharField('Имя', max_length=50)
-    surname = models.CharField('Фамилия', max_length=50)
-    email = models.EmailField('Почта')
-    linenos = models.BooleanField(default=False)
-    language = models.CharField(choices=LANGUAGE_CHOICES, default='python', max_length=100)
-    style = models.CharField(choices=STYLE_CHOICES, default='friendly', max_length=100)
-    highlighted = models.TextField()
+# Create your models here.
+class UserManager(BaseUserManager):
+    use_in_migrations = True
+
+    def _create_user(self, email, name, surname, role, password, **extra_fields):
+        email = self.normalize_email(email)
+        user = self.model(email=email, name=name, surname=surname, role=role, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, name, surname, email=None, role=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        return self._create_user(email, name, surname, role, password, **extra_fields)
+
+    def create_superuser(self, name, surname, email=None, role=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self._create_user(email, name, surname, role, password, **extra_fields)
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    username = None
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=30)
+    surname = models.CharField(max_length=40)
+    role = models.CharField(max_length=60)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    USERNAME_FIELD = 'email'
+    objects = UserManager()
+    REQUIRED_FIELDS = ['name', 'surname', 'role', ]
 
     def save(self, *args, **kwargs):
-        """
-        Use the `pygments` library to create a highlighted HTML
-        representation of the code snippet.
-        """
-        lexer = get_lexer_by_name(self.language)
-        linenos = 'table' if self.linenos else False
-        options = {'title': self.user.username} if self.user else {}
-        formatter = HtmlFormatter(style=self.style, linenos=linenos,
-                                  full=True, **options)
-        self.highlighted = highlight(self.name, lexer, formatter)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
+        super(User, self).save(*args, **kwargs)
+        return self

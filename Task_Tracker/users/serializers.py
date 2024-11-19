@@ -1,8 +1,11 @@
 from rest_framework import serializers
-from .models import Profile
+from.models import User
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = ['id', 'user', 'name', 'surname', 'password1', 'password2']
+class UserSerializer(serializers.ModelSerializer):
+    date_joined = serializers.ReadOnlyField()
+    class Meta(object):
+        model = User
+        fields = ('id', 'email', 'name', 'surname',
+                  'role', 'password')
+        extra_kwargs = {'password': {'write_only': True}}
