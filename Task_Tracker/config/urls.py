@@ -1,5 +1,5 @@
 """
-URL configuration for Task_Tracker project.
+URL configuration for config project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -14,11 +14,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from sys import meta_path
+
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import TokenRefreshView
+from users import views
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include('urls')),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('signup/', views.signup, name='signup'),
+    path('login/', views.login, name='login'),
 ]
+
+

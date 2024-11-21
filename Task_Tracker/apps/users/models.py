@@ -1,5 +1,4 @@
 from django.db import models
-import jwt.jwt as j
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -42,6 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=60)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    projects = []
     USERNAME_FIELD = 'email'
     objects = UserManager()
     REQUIRED_FIELDS = ['name', 'surname', 'role', ]
